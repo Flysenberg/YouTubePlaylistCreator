@@ -21,50 +21,71 @@ namespace YouTubePlaylistCreator.Handlers
 		
 		public static void Run()
 		{
-			string command = "";
-
-			do
+			try
 			{
-				Console.Clear();
-				Console.WriteLine("What do you want to do? (just write the number)");
-				Console.WriteLine("If you don't have a client_secrets.json file please create one first");
-				Console.WriteLine("	0 - Create new client_secrets.json file");
-				Console.WriteLine("	1 - Create new API key");
-				Console.WriteLine("	2 - Register client_secrets.json file");
-				Console.WriteLine("	3 - Register API key");
+				string command = "";
 
-				if (RegisteredClientSecrets && RegisteredApiKey)
+				do
 				{
-					Console.WriteLine("	4 - Create new playlist");
-					if (PlaylistCreated)
+					Console.Clear();
+					Console.WriteLine("What do you want to do? (just write the number)");
+					Console.WriteLine("If you don't have a client_secrets.json file please create one first");
+					Console.WriteLine("	0 - Create new client_secrets.json file");
+					Console.WriteLine("	1 - Create new API key");
+					Console.WriteLine("	2 - Register client_secrets.json file");
+					Console.WriteLine("	3 - Register API key");
+
+					if (RegisteredClientSecrets && RegisteredApiKey)
 					{
-						Console.WriteLine("	5 - Load video information file");
+						Console.WriteLine("	4 - Create new playlist");
+						if (PlaylistCreated)
+						{
+							Console.WriteLine("	5 - Load video information file");
+						}
+
+						if (PlaylistCreated && VideoInfoFileLoaded)
+						{
+							Console.WriteLine("	6 - Add all songs from file to the playlist");
+						}
 					}
 
-					if (PlaylistCreated && VideoInfoFileLoaded)
+					Console.WriteLine("	7 - Exit");
+
+					command = Console.ReadLine().Trim();
+
+					switch (command)
 					{
-						Console.WriteLine("	6 - Add all songs from file to the playlist");
+						case "0":
+							CreateNewClientSecretsFile();
+							break;
+						case "1":
+							CreateNewApiKey();
+							break;
+						case "2":
+							RegisterNewClientSecretsFile();
+							break;
+						case "3":
+							RegisterNewApiKey();
+							break;
+						case "4":
+							CreateNewPlaylist();
+							break;
+						case "5":
+							LoadSongsFile();
+							break;
+						case "6":
+							AddAllSongsToPlaylist();
+							break;
+						default:
+							break;
 					}
 				}
-
-				Console.WriteLine("	7 - Exit");
-
-				command = Console.ReadLine().Trim();
-
-				switch (command)
-				{
-					case "0": CreateNewClientSecretsFile(); break;
-					case "1": CreateNewApiKey(); break;
-					case "2": RegisterNewClientSecretsFile(); break;
-					case "3": RegisterNewApiKey(); break;
-					case "4": CreateNewPlaylist(); break;
-					case "5": LoadSongsFile(); break;
-					case "6": AddAllSongsToPlaylist(); break;
-					default:
-						break;
-				}
+				while (command != "7");
 			}
-			while (command != "7");
+			catch
+			{
+				Console.WriteLine("Some error ocurred... Restart the program");
+			}
 		}
 		
 		private static void CreateNewClientSecretsFile(string message = "")
@@ -177,9 +198,14 @@ namespace YouTubePlaylistCreator.Handlers
 				Console.WriteLine("File correctly located");
 				Thread.Sleep(1000);
 
+				Console.Clear();
+				Console.WriteLine("Getting video Ids from youtube... This might take a while so hang on");
 				VideoHandler.RegisterService(ApiKey);
 				VideoHandler.LoadSongsFromFile(fileName);
 				VideoInfoFileLoaded = true;
+
+				Console.WriteLine("Done getting video Ids");
+				Thread.Sleep(1000);
 			}
 			else
 			{
@@ -189,13 +215,18 @@ namespace YouTubePlaylistCreator.Handlers
 
 		private static void AddAllSongsToPlaylist()
 		{
-			foreach (string songId in VideoHandler.VideoIds)
+			foreach (string videoId in VideoHandler.VideoIds)
 			{
-				PlaylistHander.AddSongToPlaylist(songId);
+				PlaylistHander.AddSongToPlaylist(videoId);
+			}
+
+			if (PlaylistHander.FailedIds.Count > 0)
+			{
+				Console.WriteLine("Failed to add {0} videos to playlist", PlaylistHander.FailedIds.Count);
 			}
 
 			Console.WriteLine("Succesfully added songs to the playlist");
-			Thread.Sleep(100);
+			Thread.Sleep(1000);
 		}
 	}
 }

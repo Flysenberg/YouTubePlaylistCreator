@@ -46,9 +46,9 @@ namespace YouTubePlaylistCreator.Handlers
 					ApplicationName = AppName
 				});
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine("Failed to authenticate\nException:\n" + e);
+				Console.WriteLine("Failed to authenticate");
 				return null;
 			}
 		}

@@ -2,6 +2,7 @@
 using Google.Apis.YouTube.v3.Data;
 
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace YouTubePlaylistCreator.Handlers
@@ -10,6 +11,7 @@ namespace YouTubePlaylistCreator.Handlers
     {
 		private static Playlist Playlist;
 		private static YouTubeService YouTubeService;
+		public static List<string> FailedIds = new List<string>();
 
 		/// <summary>
 		/// Create a new playlist, will ask for the title of the playlist, the description (can be left blank)
@@ -54,9 +56,9 @@ namespace YouTubePlaylistCreator.Handlers
 
 				Playlist = await YouTubeService.Playlists.Insert(Playlist, "snippet,status").ExecuteAsync();
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine("Failed to create playlist\nException:\n" + e);
+				Console.WriteLine("Failed to create playlist");
 			}
 		}
 
@@ -81,9 +83,9 @@ namespace YouTubePlaylistCreator.Handlers
 
 				newPlaylistItem = await YouTubeService.PlaylistItems.Insert(newPlaylistItem, "snippet").ExecuteAsync();
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine("Failed to add song to playlist\nException:\n" + e);
+				FailedIds.Add(videoId);
 			}
 		}
 	}

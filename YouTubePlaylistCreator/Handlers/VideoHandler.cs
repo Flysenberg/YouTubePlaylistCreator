@@ -5,6 +5,7 @@ using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 using YouTubePlaylistCreator.Properties;
 
@@ -42,9 +43,9 @@ namespace YouTubePlaylistCreator.Handlers
 					ApplicationName = AppName
 				});
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine("Failed to register YouTube service using the provided API key\nException:\n" + e);
+				Console.WriteLine("Failed to register YouTube service using the provided API key");
 			}
 		}
 
@@ -66,6 +67,9 @@ namespace YouTubePlaylistCreator.Handlers
 					}
 				}
 
+				Console.WriteLine("Loaded {0} songs", VideoNames.Count);
+				Thread.Sleep(1000);
+
 				foreach (string songName in VideoNames)
 				{
 					GetVideoId(songName, 1);
@@ -78,9 +82,9 @@ namespace YouTubePlaylistCreator.Handlers
 					DisplayFailedToFindVideos();
 				}
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine("Failed to locate file\nException:\n" + e);
+				Console.WriteLine("Failed to locate file");
 			}
 		}
 		
@@ -89,7 +93,7 @@ namespace YouTubePlaylistCreator.Handlers
 		/// </summary>
 		/// <param name="videoName">Query to search</param>
 		/// <param name="results">Number of results to return</param>
-		public static async void GetVideoId(string videoName, int results)
+		public static void GetVideoId(string videoName, int results)
 		{
 			try
 			{
@@ -97,7 +101,7 @@ namespace YouTubePlaylistCreator.Handlers
 				searchListRequest.Q = videoName; // Replace with your search term.
 				searchListRequest.MaxResults = results;
 
-				SearchListResponse searchListResponse = await searchListRequest.ExecuteAsync();
+				SearchListResponse searchListResponse = searchListRequest.Execute();
 
 				foreach (var searchResult in searchListResponse.Items)
 				{
@@ -114,7 +118,7 @@ namespace YouTubePlaylistCreator.Handlers
 			}
 			catch
 			{
-				FailedToFind.Add(videoName);
+				Console.WriteLine("Failed to get id of {0}", videoName);
 			}
 		}
 
@@ -126,6 +130,7 @@ namespace YouTubePlaylistCreator.Handlers
 		{
 			try
 			{
+				Console.Clear();
 				Console.WriteLine("Failed to find Ids of {0} videos\n", FailedToFind.Count);
 				Console.WriteLine("You want to see a list of all failed videos? (y/N)\n");
 
@@ -137,11 +142,19 @@ namespace YouTubePlaylistCreator.Handlers
 					{
 						Console.WriteLine(videoName);
 					}
+
+					Console.WriteLine(Resources.Back);
+					string back = Console.ReadLine();
+
+					if (back == "back")
+					{
+						return;
+					}
 				}
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine("Exception:\n" + e);
+				Console.WriteLine("Error ocurred");
 			}
 		}
 	}
