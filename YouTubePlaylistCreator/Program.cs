@@ -7,9 +7,9 @@ namespace YouTubePlaylistCreator
 	class Program
     {
 		static void Main(string[] args)
-			=> new Program().Run().GetAwaiter().GetResult();
+			=> new Program().Run();
 
-		private async Task Run()
+		private void Run()
 		{
 			InteractionHandler.Run();
 		}

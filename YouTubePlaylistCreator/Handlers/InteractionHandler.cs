@@ -11,13 +11,14 @@ namespace YouTubePlaylistCreator.Handlers
 	public class InteractionHandler
     {
 		public static string ApiKey = Resources.APIKey;
-		public static string ClientSecrets = "client_secrets.json";
+		public static string ClientSecrets = Resources.ClientSecretsFile;
 		private static string Back = "Type back to go back to revious menu";
 		
 		private static bool RegisteredClientSecrets = false;
+		private static bool RegisteredApiKey = false;
 		private static bool PlaylistCreated = false;
 		private static bool VideoInfoFileLoaded = false;
-
+		
 		public static void Run()
 		{
 			string command = "";
@@ -26,13 +27,13 @@ namespace YouTubePlaylistCreator.Handlers
 			{
 				Console.Clear();
 				Console.WriteLine("What do you want to do? (just write the number)");
-				Console.WriteLine("If you don't have a client_secrets.json file please create first");
+				Console.WriteLine("If you don't have a client_secrets.json file please create one first");
 				Console.WriteLine("	0 - Create new client_secrets.json file");
 				Console.WriteLine("	1 - Create new API key");
 				Console.WriteLine("	2 - Register client_secrets.json file");
-				Console.WriteLine("	3 - Register API key (Optional)");
+				Console.WriteLine("	3 - Register API key");
 
-				if (RegisteredClientSecrets)
+				if (RegisteredClientSecrets && RegisteredApiKey)
 				{
 					Console.WriteLine("	4 - Create new playlist");
 					if (PlaylistCreated)
@@ -65,7 +66,7 @@ namespace YouTubePlaylistCreator.Handlers
 			}
 			while (command != "7");
 		}
-
+		
 		private static void CreateNewClientSecretsFile(string message = "")
 		{
 			Console.Clear();
@@ -134,15 +135,10 @@ namespace YouTubePlaylistCreator.Handlers
 			Console.Clear();
 			Console.WriteLine(message);
 			Console.WriteLine(Back);
-			Console.WriteLine("Specify new API Key: (Type default to use the default API already present)");
+			Console.WriteLine("Specify API Key:");
 			string apiKey = Console.ReadLine();
 
 			if (apiKey == "back")
-			{
-				return;
-			}
-
-			if (apiKey == "default")
 			{
 				return;
 			}
@@ -153,6 +149,7 @@ namespace YouTubePlaylistCreator.Handlers
 			}
 
 			ApiKey = apiKey;
+			RegisteredApiKey = true;
 		}
 
 		private static async void CreateNewPlaylist()

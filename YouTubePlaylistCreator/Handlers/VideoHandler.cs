@@ -112,9 +112,9 @@ namespace YouTubePlaylistCreator.Handlers
 					}
 				}
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine("Failed to get the video ID\nException:\n" + e);
+				FailedToFind.Add(videoName);
 			}
 		}
 
