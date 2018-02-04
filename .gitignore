@@ -259,3 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/YouTubePlaylistCreator/client_secrets.json
+/YouTubePlaylistCreator/Properties/Resources.Designer.cs
+/YouTubePlaylistCreator/Properties/Resources.resx

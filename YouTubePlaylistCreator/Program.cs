@@ -1,12 +1,17 @@
-﻿using System;
+﻿using System.Threading.Tasks;
+
+using YouTubePlaylistCreator.Handlers;
 
 namespace YouTubePlaylistCreator
 {
-    class Program
+	class Program
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
-    }
+		static void Main(string[] args)
+			=> new Program().Run().GetAwaiter().GetResult();
+
+		private async Task Run()
+		{
+			InteractionHandler.Run();
+		}
+	}
 }
