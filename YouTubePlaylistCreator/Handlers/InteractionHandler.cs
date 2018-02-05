@@ -8,6 +8,19 @@ using YouTubePlaylistCreator.Properties;
 
 namespace YouTubePlaylistCreator.Handlers
 {
+	public enum Result
+	{
+		EXIT = 0,
+		CREATE_CLIENT_SECRET,
+		CREATE_API_KEY,
+		REGISTER_CLIENT_SECRET,
+		REGISTER_API_KEY,
+		CREATE_PLAYLIST,
+		REGISTER_PLAYLIST,
+		REGISTER_SONGS,
+		ADD_SONGS_TO_PLAYLIST
+	}
+
 	public class InteractionHandler
     {
 		public static string ApiKey = Resources.APIKey;
@@ -17,70 +30,76 @@ namespace YouTubePlaylistCreator.Handlers
 		private static bool RegisteredClientSecrets = false;
 		private static bool RegisteredApiKey = false;
 		private static bool PlaylistCreated = false;
+		private static bool PlaylistRegistered = false;
 		private static bool VideoInfoFileLoaded = false;
 		
 		public static void Run()
 		{
 			try
 			{
-				string command = "";
+				Result res;
 
 				do
 				{
 					Console.Clear();
 					Console.WriteLine("What do you want to do? (just write the number)");
 					Console.WriteLine("If you don't have a client_secrets.json file please create one first");
-					Console.WriteLine("	0 - Create new client_secrets.json file");
-					Console.WriteLine("	1 - Create new API key");
-					Console.WriteLine("	2 - Register client_secrets.json file");
-					Console.WriteLine("	3 - Register API key");
+					Console.WriteLine("	0 - Exit");
+					Console.WriteLine("	1 - Create new client_secrets.json file");
+					Console.WriteLine("	2 - Create new API key");
+					Console.WriteLine("	3 - Register client_secrets.json file");
+					Console.WriteLine("	4 - Register API key");
 
 					if (RegisteredClientSecrets && RegisteredApiKey)
 					{
-						Console.WriteLine("	4 - Create new playlist");
-						if (PlaylistCreated)
+						Console.WriteLine("	5 - Create new playlist");
+						Console.WriteLine("	6 - Register playlist");
+						if (PlaylistCreated || PlaylistRegistered)
 						{
-							Console.WriteLine("	5 - Load video information file");
+							Console.WriteLine("	7 - Load video information file");
 						}
 
-						if (PlaylistCreated && VideoInfoFileLoaded)
+						if (VideoInfoFileLoaded)
 						{
-							Console.WriteLine("	6 - Add all songs from file to the playlist");
+							Console.WriteLine("	8 - Add all songs from file to the playlist");
 						}
 					}
 
-					Console.WriteLine("	7 - Exit");
+					res = (Result) int.Parse(Console.ReadLine().Trim());
 
-					command = Console.ReadLine().Trim();
-
-					switch (command)
+					switch (res)
 					{
-						case "0":
+						case Result.EXIT:
+							return;
+						case Result.CREATE_CLIENT_SECRET:
 							CreateNewClientSecretsFile();
 							break;
-						case "1":
+						case Result.CREATE_API_KEY:
 							CreateNewApiKey();
 							break;
-						case "2":
+						case Result.REGISTER_CLIENT_SECRET:
 							RegisterNewClientSecretsFile();
 							break;
-						case "3":
+						case Result.REGISTER_API_KEY:
 							RegisterNewApiKey();
 							break;
-						case "4":
+						case Result.CREATE_PLAYLIST:
 							CreateNewPlaylist();
 							break;
-						case "5":
+						case Result.REGISTER_PLAYLIST:
+							RegisterNewPlaylist();
+							break;
+						case Result.REGISTER_SONGS:
 							LoadSongsFile();
 							break;
-						case "6":
+						case Result.ADD_SONGS_TO_PLAYLIST:
 							AddAllSongsToPlaylist();
 							break;
 						default:
 							break;
 					}
 				}
-				while (command != "7");
+				while (res != Result.EXIT);
 			}
 			catch
 			{
@@ -215,6 +234,9 @@ namespace YouTubePlaylistCreator.Handlers
 
 		private static void AddAllSongsToPlaylist()
 		{
+			Console.Clear();
+			Console.WriteLine("Adding songs to playlist.. Might take a while");
+
 			foreach (string videoId in VideoHandler.VideoIds)
 			{
 				PlaylistHander.AddSongToPlaylist(videoId);
@@ -227,6 +249,28 @@ namespace YouTubePlaylistCreator.Handlers
 
 			Console.WriteLine("Succesfully added songs to the playlist");
 			Thread.Sleep(1000);
+		}
+
+		private static void RegisterNewPlaylist(string message = "")
+		{
+			Console.Clear();
+			Console.WriteLine(message);
+			Console.WriteLine(Back);
+			Console.WriteLine("Write the playlist's ID:");
+			string id = Console.ReadLine().Trim();
+
+			if (id == "back")
+			{
+				return;
+			}
+
+			if (id is null || id == "")
+			{
+				RegisterNewPlaylist("Invalid ID");
+			}
+
+			PlaylistHander.GetPlaylist(id);
+			PlaylistRegistered = true;
 		}
 	}
 }
